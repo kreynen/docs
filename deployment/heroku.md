@@ -1,25 +1,16 @@
 # Deploying an API Platform App on Heroku
 
-[Heroku](https://www.heroku.com) is a popular, fast, scalable and reliable *Platform As A Service* (PaaS). As Heroku offers a
-free plan including database support through [Heroku Postgres](https://www.heroku.com/postgres), it's a convenient way
-to experiment with API Platform.
+[Heroku](https://www.heroku.com) is a popular, fast, scalable and reliable *Platform As A Service* (PaaS). As Heroku offers a free plan including database support through [Heroku Postgres](https://www.heroku.com/postgres). Heroku also supports MySQL databases provided by [the ClearDB add-on](https://addons.heroku.com/cleardb), but we'll use Postgres to experiment with API Platform on Heroku.
 
-The API Platform Heroku integration also supports MySQL databases provided by [the ClearDB add-on](https://addons.heroku.com/cleardb).
+Deploying API Platform applications on Heroku is straightforward and builds on [Heroku's Symfony 4 deployments]  (https://devcenter.heroku.com/articles/deploying-symfony4).
 
-Deploying API Platform applications on Heroku is straightforward and you will learn how to do it in this tutorial.
-
-*Note: this tutorial works perfectly well with API Platform but also with any Symfony application based on the Symfony Standard
-Edition.*
-
-If you don't already have one, [create an account on Heroku](https://signup.heroku.com/signup/dc). Then install [the Heroku
-toolbelt](https://devcenter.heroku.com/articles/getting-started-with-php#set-up). We're guessing you already
+If you don't already have one, [create an account on Heroku](https://signup.heroku.com/dc). Then install [the Heroku
+CLI](https://devcenter.heroku.com/articles/heroku-cli). We're guessing you already
 have a working install of [Composer](http://getcomposer.org). Perfect, we will need it.
 
-Create a new [API Platform project](distribution/index.md) which will be used in the rest of this example.
+Create a new [API Platform project](distribution/#installing-the-framework) using the .tar.gz distribution. We will be used in the rest of this example.
 
-Heroku relies on [environment variables](https://devcenter.heroku.com/articles/config-vars) for its configuration. Regardless
-of what provider you choose for hosting your application, using environment variables to configure your production environment
-is a best practice promoted by API Platform.
+Heroku relies on [environment variables](https://devcenter.heroku.com/articles/config-vars) for its configuration. Regardless of what provider you choose for hosting your application, using environment variables to configure your production environment is a best practice promoted by API Platform.
 
 Create a Heroku `app.json` file at the root of the `api/` directory to configure the deployment:
 
@@ -47,8 +38,7 @@ Create a Heroku `app.json` file at the root of the `api/` directory to configure
 
 The file also tells the Heroku deployment system to build a PHP container and to add the Postgres add-on.
 
-We are almost done, but API Platform (and Symfony) has a particular directory structure which requires further configuration.
-We must tell Heroku that the document root is `public/`, and that all other directories must be private.
+We are almost done, but API Platform (and Symfony) has a particular directory structure which requires further configuration. We must tell Heroku that the document root is `public/`, and that all other directories must be private. We are only going to be deploying the `api/` directory of the project to Heroku. 
 
 Create a new file named `Procfile` in the `api/` directory with the following content:
 
@@ -56,7 +46,7 @@ Create a new file named `Procfile` in the `api/` directory with the following co
 web: vendor/bin/heroku-php-apache2 public/
 ```
 
-Be sure to add the Apache Pack to your dependencies:
+Add the Apache Pack to your project's Composer dependencies:
 
     composer require symfony/apache-pack
 
@@ -74,22 +64,10 @@ As Heroku doesn't support Varnish out of the box, let's disable its integration:
 -        public: true
 ```
 
-Heroku provides another free service, [Logplex](https://devcenter.heroku.com/articles/logplex), which allows us to centralize
-and persist application logs. Because API Platform writes logs on `STDERR`, it will work seamlessly.
+Heroku provides another free service, [Logplex](https://devcenter.heroku.com/articles/logplex), which allows us to centralize and persist application logs. Because API Platform writes logs on `STDERR`, it will work seamlessly.
 
 However, if you use Monolog instead of the default logger, you'll need to configure it to output to `STDERR` instead of
 in a file.
-
-Open `api/config/packages/prod/monolog.yaml` and apply the following patch:
-
-```diff
-     handlers:
-         nested:
-             type: stream
--            path: "%kernel.logs_dir%/%kernel.environment%.log"
-+            path: php://stderr
-             level: debug
-```
 
 We are now ready to deploy our app!
 
