@@ -6,7 +6,7 @@ Deploying API Platform applications on Heroku is straightforward and builds on [
 
 If you don't already have one, [create an account on Heroku](https://signup.heroku.com/dc). Then install [the Heroku
 CLI](https://devcenter.heroku.com/articles/heroku-cli). We're guessing you already
-have a working install of [Composer](http://getcomposer.org). Perfect, we will need it.
+have a working install of [Composer](http://getcomposer.org) in an environment running PHP7.4 or greater. Perfect, we will need it.
 
 Create a new [API Platform project](distribution/#installing-the-framework) using the .tar.gz distribution. We will be used in the rest of this example.
 
